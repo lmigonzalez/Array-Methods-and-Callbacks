@@ -6,6 +6,10 @@ const { fifaData } = require('./fifa.js')
 Practice accessing data by console.log-ing the following pieces of data note, you may want to filter the data first 😉*/
 
 //(a) Home Team name for 2014 world cup final
+// const homeTeam = fifaData.filter(function(team){
+//     return team['Home Team Name']
+// })
+// console.log(homeTeam)
 
 //(b) Away Team name for 2014 world cup final
 
@@ -24,9 +28,17 @@ Use getFinals to do the following:
 hint - you should be looking at the stage key inside of the objects
 */
 
-function getFinals(/* code here */) {
-   /* code here */
+function getFinals(data) {
+
+    const finalTeams = data.filter(function(element){
+        return element.Stage === 'Final'
+    });
+    
+    
+   return finalTeams
 }
+
+console.log(getFinals(fifaData))
 
 
 
@@ -36,8 +48,10 @@ Use the higher-order function called getYears to do the following:
 2. Receive a callback function getFinals from task 2 
 3. Return an array called years containing all of the years in the getFinals data set*/
 
-function getYears(/* code here */) {
-    /* code here */
+function getYears(data, cb) {
+    return cb(data).map(function(item){
+        return item.Year
+    })
 }
 
 
@@ -47,12 +61,22 @@ Use the higher-order function getWinners to do the following:
 1. Receives an array
 2. Receives the callback function getFinals from task 2 
 3. Determines the winner (home or away) of each `finals` game. 
-4. Returns the names of all winning countries in an array called `winners` */ 
+4. Return the names of all winning countries in an array called `winners` */ 
 
-function getWinners(/* code here */) {
-    /* code here */
+function getWinners(data, cb) {
+    const winners = cb(data).map(function(item){
+        if(item["Home Team Goals"] + item["Half-time Home Goals"] > item["Away Team Goals"] + item["Half-time Away Goals"]){
+            return item["Home Team Name"]
+        }
+        else{
+            return item["Away Team Name"]
+        }
+    })
+
+    return winners
 }
 
+console.log(getWinners(fifaData, getFinals))
 
 
 /* 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 Task 5: 🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀 
@@ -66,8 +90,14 @@ Use the higher-order function getWinnersByYear to do the following:
 hint: the strings returned need to exactly match the string in step 4.
  */
 
-function getWinnersByYear(/* code here */) {
-    /* code here */
+function getWinnersByYear(data, getFinalscb, getYearscb, getWinnerscb) {
+    const year = getYearscb(data, getFinalscb);
+    const country = getWinnerscb(data, getFinalscb);
+    const array = country(data).map(function(item, index){
+        return `In ${year[index]}, ${item} won the world cup!`
+    })
+
+    return array
 }
 
 
@@ -82,8 +112,12 @@ Use the higher order function getAverageGoals to do the following:
  Example of invocation: getAverageGoals(getFinals(fifaData));
 */
 
-function getAverageGoals(/* code here */) {
-   /* code here */
+function getAverageGoals(cb) {
+   const average = cb.reduce(function(accumulator, item){
+       return accumulator + item['Home Team Goals'] + item['Away Team Goals']
+   }, 0)
+
+   return (average / cb.length).toFixed(2);
 }
 
 
